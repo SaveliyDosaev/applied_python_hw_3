@@ -3,6 +3,7 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from typing import List
 from . import schemas, actions, db
+from datetime import datetime
 
 db.Base.metadata.create_all(bind=db.engine)
 
@@ -32,6 +33,10 @@ def redirect_to_original(short_code: str, db: Session = Depends(get_db)):
     db_link = actions.get_link_by_alias(db, alias=short_code)
     if not db_link:
         raise HTTPException(status_code=404, detail="Link not found")
+    if db_link.expires_at and db_link.expires_at < datetime.utcnow():
+        actions.delete_link(db, db_link)
+        raise HTTPException(status_code=410, detail="Link has expired and been deleted")
+    
     actions.increment_click_count(db, db_link)
     return RedirectResponse(url=db_link.original_url)
 

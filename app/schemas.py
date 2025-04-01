@@ -41,7 +41,7 @@ class ShortLinkSearchResult(ShortLinkBase):
     click_count: int
 
 class ShortLink(db.Base):
-    __tablename__ = "short_links_4"
+    __tablename__ = "short_links_55"
     id = Column(Integer, primary_key=True, index=True)
     original_url = Column(String, index=True)
     short_code = Column(String, unique=True, index=True)
